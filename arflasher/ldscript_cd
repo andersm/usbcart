@@ -1,0 +1,29 @@
+/*
+ * Sega Saturn cartridge flash tool linker script
+ * Anders Montonen, 2012
+ *
+ * Based on Bart Trzynadlowski's Custom Sega Saturn Linker Script
+ *
+ * Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
+ */
+
+OUTPUT_FORMAT("binary")
+SECTIONS
+{
+    . = 0x6002000;
+    __ip_start = .;
+    .text :
+    {
+        KEEP(*(.sysid))
+        *(.text)
+    }
+    .data :
+    {
+        *(.data);
+    }
+    __ip_end = .;
+    __ip_len = __ip_end - __ip_start;
+    __bss_start = .;
+    .bss : { *(.bss);  }
+    __bss_end = .;
+}

@@ -1,0 +1,185 @@
+Cmp-Mod V01 Created by CvPcb (2012-01-19 BZR 3256)-stable date = 29/04/2012 03:28:42
+
+BeginCmp
+TimeStamp = /4F6D5FC3;
+Reference = C1;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D5FBF;
+Reference = C2;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D5FBC;
+Reference = C3;
+ValeurCmp = 4.7uF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D5C43;
+Reference = C4;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F9C895C;
+Reference = C5;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F9C8967;
+Reference = C6;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F9C897A;
+Reference = C7;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F9C897E;
+Reference = C8;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F9C8981;
+Reference = C9;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F9C8983;
+Reference = C10;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F9C8984;
+Reference = C11;
+ValeurCmp = 100nF;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D37CD;
+Reference = CN1;
+ValeurCmp = CARTRIDGE_EDGE_CONNECTOR;
+IdModule  = CARTRIDGE_EDGE_CONNECTOR2;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D816F;
+Reference = JP1;
+ValeurCmp = JUMPER;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D81BD;
+Reference = R1;
+ValeurCmp = 10k;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D5D62;
+Reference = R2;
+ValeurCmp = 4k7;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D5DB4;
+Reference = R3;
+ValeurCmp = 10k;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D5E2E;
+Reference = R4;
+ValeurCmp = 10k;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D3D33;
+Reference = U1;
+ValeurCmp = 74HCT245;
+IdModule  = soic-20;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6E18CE;
+Reference = U2;
+ValeurCmp = 74HCT138;
+IdModule  = so-16;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D3804;
+Reference = U3;
+ValeurCmp = SST39SF010A;
+IdModule  = PLCC32;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D3816;
+Reference = U4;
+ValeurCmp = SST39SF010A;
+IdModule  = PLCC32;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F81BD1D;
+Reference = U5;
+ValeurCmp = 74HCT32;
+IdModule  = so-14;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6E1F6D;
+Reference = U6;
+ValeurCmp = 74AHC1G04;
+IdModule  = SOT23-5;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D76ED;
+Reference = U7;
+ValeurCmp = 74HCT245;
+IdModule  = soic-20;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F6D5A93;
+Reference = U8;
+ValeurCmp = FT245RL;
+IdModule  = SSOP28;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F71F515;
+Reference = X1;
+ValeurCmp = USB-MB-S;
+IdModule  = con-usb-USB-MB-S;
+EndCmp
+
+EndListe

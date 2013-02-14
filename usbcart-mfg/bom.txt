@@ -1,0 +1,25 @@
+C1         100nF       0603
+C2         100nF       0603
+C3         4.7uF       0603
+C4         100nF       0603
+C5         100nF       0603
+C6         100nF       0603
+C7         100nF       0603
+C8         100nF       0603
+C9         100nF       0603
+C10        100nF       0603
+C11        100nF       0603
+JP1        JUMPER      0.1" header (optional)
+R1         10k         0603
+R2         4k7         0603
+R3         10k         0603
+R4         10k         0603
+U1         74HCT245    SOIC-20 (eg. Texas Instruments SN74HCT245DW)
+U2         74HCT138    SOIC-16 (eg. Fairchild MC74HCT138ADG)
+U3         SST39SF010A PLCC32
+U4         SST39SF010A PLCC32
+U5         74HCT32     SO-14 (eg. NXP 74HCT32D,653)
+U6         74AHC1G04   SOT23-5 (eg. Texas Instruments SN74AHC1G04QDBVRQ1)
+U7         74HCT245    SOIC-20 (eg. Texas Instruments SN74HCT245DW)
+U8         FT245RL     SSOP28
+X1         USB-MB-S    Surface mount mini USB B connector (eg. Wurth 65100516121)

@@ -1,0 +1,28 @@
+EESchema-DOCLIB  Version 2.0  Date: 27/03/2012 20:12:07
+#
+$CMP 74HCT138
+D Decoder 3 to 8 (active low outputs)
+K TTL DECOD DECOD8
+$ENDCMP
+#
+$CMP 74HCT245
+D Octal BUS Transceivers, 3 State out
+K TTL BUS 3State
+$ENDCMP
+#
+$CMP 74HCT32
+D Quad Or 2 inputs
+K TTL Or2
+$ENDCMP
+#
+$CMP FT245RL
+D FT245RL
+K FTDI USB FIFO
+$ENDCMP
+#
+$CMP SST39SF010A
+D 1 Mbit Multi-Purpose Flash
+K 128KB flash
+$ENDCMP
+#
+#End Doc Library
