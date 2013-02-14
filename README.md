@@ -25,6 +25,7 @@ A file-transfer tool for the USB cartridge for Unix-like systems. Depends on [li
 The hardware design is released under the terms of the [Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)](http://creativecommons.org/licenses/by-sa/3.0/) license.
 
 License for the packages in the "walter" subdirectory:
+
     Kicad 3d Packages by W. Lain - kcswalter@member.fsf.org
 
     These packages are released under the terms of the Creative Commons license v3.0, Attribution-Share Alike.
