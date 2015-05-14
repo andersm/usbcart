@@ -218,6 +218,36 @@ static void PrintUsage(const char *pProgname)
     printf("or hexadecimal (preceded by '0x')\n");
 }
 
+static int SendCommandWithAddressAndLength(unsigned int cmd, unsigned int address,
+                                           unsigned int size)
+{
+    SendBuf[0] = cmd;
+    SendBuf[1] = (unsigned char)(address >> 24);
+    SendBuf[2] = (unsigned char)(address >> 16);
+    SendBuf[3] = (unsigned char)(address >> 8);
+    SendBuf[4] = (unsigned char)(address);
+    SendBuf[5] = (unsigned char)(size >> 24);
+    SendBuf[6] = (unsigned char)(size >> 16);
+    SendBuf[7] = (unsigned char)(size >> 8);
+    SendBuf[8] = (unsigned char)(size);
+
+    return ftdi_write_data(&Device, SendBuf, 9);
+}
+
+static void ReportPerformance(const struct timeval *pStartTime,
+                              const struct timeval *pEndTime,
+                              unsigned int size)
+{
+    signed long long timedelta;
+
+    timedelta = (signed long long)pEndTime->tv_sec * 1000000ll +
+                (signed long long)pEndTime->tv_usec -
+                (signed long long)pStartTime->tv_sec * 1000000ll -
+                (signed long long)pStartTime->tv_usec;
+    printf("Transfer time %f\n", timedelta/1000000.0f);
+    printf("Transfer speed %f K/s\n", (size/1024.0f)/(timedelta/1000000.0f));
+}
+
 static int DoDownload(const char *pFilename, const unsigned int address,
                       const unsigned int size)
 {
@@ -227,23 +257,13 @@ static int DoDownload(const char *pFilename, const unsigned int address,
     int             status = -1;
     crc_t           readChecksum, calcChecksum;
     struct timeval      before, after;
-    signed long long    timedelta;
 
     pFileBuffer = (unsigned char*)malloc(size);
     if (pFileBuffer != NULL)
     {
         gettimeofday(&before, NULL);
-        SendBuf[0] = FUNC_DOWNLOAD; /* Client function */
-        SendBuf[1] = (unsigned char)(address >> 24);
-        SendBuf[2] = (unsigned char)(address >> 16);
-        SendBuf[3] = (unsigned char)(address >> 8);
-        SendBuf[4] = (unsigned char)(address);
-        SendBuf[5] = (unsigned char)(size >> 24);
-        SendBuf[6] = (unsigned char)(size >> 16);
-        SendBuf[7] = (unsigned char)(size >> 8);
-        SendBuf[8] = (unsigned char)(size);
-
-        status = ftdi_write_data(&Device, SendBuf, 9);
+        status = SendCommandWithAddressAndLength(FUNC_DOWNLOAD,
+                                                 address, size);
         if (status < 0)
         {
             printf("Send download command error: %s\n",
@@ -278,12 +298,7 @@ static int DoDownload(const char *pFilename, const unsigned int address,
         } while (status == 0);
 
         gettimeofday(&after, NULL);
-        timedelta = (signed long long) after.tv_sec * 1000000ll +
-                    (signed long long) after.tv_usec -
-                    (signed long long) before.tv_sec * 1000000ll -
-                    (signed long long) before.tv_usec;
-        printf("Transfer time %f\n", timedelta/1000000.0f);
-        printf("Transfer speed %f K/s\n", (size/1024.0f)/(timedelta/1000000.0f));
+        ReportPerformance(&before, &after, size);
 
         calcChecksum = crc_init();
         calcChecksum = crc_update(calcChecksum, pFileBuffer, size);
@@ -316,10 +331,7 @@ DownloadError:
     return status < 0 ? 0 : 1;
 }
 
-/* Sending the write command and data separately is inefficient,
-   but simplifies the code. The alternative is to copy also the data
-   into the sendbuffer. */
-static int DoUpload(const char *pFilename, const unsigned int Address)
+static int DoUpload(const char *pFilename, const unsigned int address)
 {
     unsigned char      *pFileBuffer = NULL;
     unsigned int        size = -1, sent = 0;
@@ -327,7 +339,6 @@ static int DoUpload(const char *pFilename, const unsigned int Address)
     int                 status = 0;
     crc_t               checksum = crc_init();
     struct timeval      before, after;
-    signed long long    timedelta;
 
     File = fopen(pFilename, "rb");
     if (File == NULL)
@@ -352,17 +363,8 @@ static int DoUpload(const char *pFilename, const unsigned int Address)
             checksum = crc_finalize(checksum);
 
             gettimeofday(&before, NULL);
-            SendBuf[0] = FUNC_UPLOAD; /* Client function */
-            SendBuf[1] = (unsigned char)(Address >> 24);
-            SendBuf[2] = (unsigned char)(Address >> 16);
-            SendBuf[3] = (unsigned char)(Address >> 8);
-            SendBuf[4] = (unsigned char)Address;
-            SendBuf[5] = (unsigned char)(size >> 24);
-            SendBuf[6] = (unsigned char)(size >> 16);
-            SendBuf[7] = (unsigned char)(size >> 8);
-            SendBuf[8] = (unsigned char)size;
-            status = ftdi_write_data(&Device, SendBuf, 9);
-
+            status = SendCommandWithAddressAndLength(FUNC_UPLOAD,
+                                                     address, size);
             if (status < 0)
             {
                 printf("Send upload command error: %s\n",
@@ -410,12 +412,7 @@ static int DoUpload(const char *pFilename, const unsigned int Address)
             }
 
             gettimeofday(&after, NULL);
-            timedelta = (signed long long) after.tv_sec * 1000000ll +
-                        (signed long long) after.tv_usec -
-                        (signed long long) before.tv_sec * 1000000ll -
-                        (signed long long) before.tv_usec;
-            printf("Transfer time %f\n", timedelta/1000000.0f);
-            printf("Transfer speed %f K/s\n", (size/1024.0f)/(timedelta/1000000.0f));
+            ReportPerformance(&before, &after, size);
 
 UploadError:
             free(pFileBuffer);
