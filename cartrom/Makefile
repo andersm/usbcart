@@ -23,37 +23,37 @@
 #   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #   POSSIBILITY OF SUCH DAMAGE.
 
-CC	=	sh-elf-gcc
-AS	=	sh-elf-as
-LDFLAGS	=	-nostartfiles -nostdlib -T ldscript
-FLAGS	=	-Wall -Werror -m2 -Os -fomit-frame-pointer -std=c99
+CC = sh-elf-gcc
+AS = sh-elf-as
+LDFLAGS = -nostartfiles -nostdlib -T ldscript
+FLAGS   = -Wall -Werror -m2 -Os -fomit-frame-pointer -std=c99
 
-LIBS	=	-lgcc
+LIBS = -lgcc
 
-EXE	=	romimage.bin
+EXE = romimage.bin
 
-OBJ	=	obj/crt0.o	\
-		obj/main.o	\
-		obj/crc.o   \
-		obj/sysid.o
+OBJ = obj/crt0.o \
+	obj/main.o   \
+	obj/crc.o    \
+	obj/sysid.o
 
-all	:	$(EXE)
+all : $(EXE)
 
-$(EXE)	:	$(OBJ)
-		$(CC) $(LDFLAGS) $(OBJ) $(LIBS) -o $(EXE)
+$(EXE) : makedir $(OBJ)
+	$(CC) $(LDFLAGS) $(OBJ) $(LIBS) -o $(EXE)
 
-obj/%.o :	%.c
-		$(CC) -c $< -o $@ $(FLAGS)
+obj/%.o : %.c
+	$(CC) -c $< -o $@ $(FLAGS)
 
-obj/%.o :	%.S
-		$(AS) $< -o $@
+obj/%.o : %.S
+	$(AS) $< -o $@
 
-clean	:
-		rm -f obj/*.o
-		rm -f $(EXE)
+clean :
+	rm -f obj/*.o
+	rm -f $(EXE)
 
 makedir :
-		mkdir obj
+	mkdir -p obj
 
 #
 # end of makefile
