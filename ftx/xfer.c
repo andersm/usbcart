@@ -44,7 +44,7 @@
 #define USB_WRITEPACKET_SIZE (4*1024)
 #define USB_PAYLOAD(x) ((x)-(((x)/64)*2))
 #define READ_PAYLOAD_SIZE (USB_PAYLOAD(USB_READPACKET_SIZE))
-#define WRITE_PAYLOAD_SIZE (USB_PAYLOAD(USB_WRITEPACKET_SIZE))
+#define WRITE_PAYLOAD_SIZE (USB_WRITEPACKET_SIZE)
 
 static unsigned char SendBuf[2*WRITE_PAYLOAD_SIZE];
 static unsigned char RecvBuf[2*READ_PAYLOAD_SIZE];
@@ -256,7 +256,7 @@ static int DoDownload(const char *pFilename, const unsigned int address,
     unsigned int    received = 0;
     int             status = -1;
     crc_t           readChecksum, calcChecksum;
-    struct timeval      before, after;
+    struct timeval  before, after;
 
     pFileBuffer = (unsigned char*)malloc(size);
     if (pFileBuffer != NULL)
