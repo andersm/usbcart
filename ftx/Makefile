@@ -1,5 +1,5 @@
 #   Sega Saturn USB flash cart transfer utility
-#   Copyright © 2012, 2013 Anders Montonen
+#   Copyright © 2012, 2013, 2015 Anders Montonen
 #   All rights reserved.
 #
 #   Redistribution and use in source and binary forms, with or without

@@ -1,7 +1,7 @@
 /*
 
     Sega Saturn USB flash cart transfer utility
-    Copyright © 2012, 2013 Anders Montonen
+    Copyright © 2012, 2013, 2015 Anders Montonen
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -51,10 +51,11 @@ static unsigned char RecvBuf[2*READ_PAYLOAD_SIZE];
 static struct ftdi_context Device = {0};
 
 static void PrintUsage(const char *pProgname);
-static int DoDownload(const char *pFilename, const unsigned int Address,
-                       const unsigned int Size);
-static int DoUpload(const char *pFilename, const unsigned int Address);
-static int DoExecute(const char *pFilename, const unsigned int Address);
+static int DoDownload(const char *pFilename, const unsigned int address,
+                      const unsigned int size);
+static int DoUpload(const char *pFilename, const unsigned int address);
+static int DoRun(const unsigned int address);
+static int DoExecute(const char *pFilename, const unsigned int address);
 static int InitComms(const int VID, const int PID);
 static void CloseComms(void);
 static void ParseNumericArg(const char *pArg, unsigned int *pResult);
@@ -65,7 +66,15 @@ enum
 {
     FUNC_DOWNLOAD = 1,
     FUNC_UPLOAD,
-    FUNC_EXEC
+    FUNC_EXEC,
+    FUNC_RUN,
+};
+
+enum
+{
+    CMD_DOWNLOAD = 1,
+    CMD_UPLOAD,
+    CMD_EXEC
 };
 
 int main(int argc, char *argv[])
@@ -157,6 +166,19 @@ int main(int argc, char *argv[])
             console = 1;
             ii++;
         }
+        else if (!strcmp(argv[ii], "-r") || !strcmp(argv[ii], "-R"))
+        {
+            if (argc < ii + 1)
+            {
+                error = 1;
+            }
+            else
+            {
+                ParseNumericArg(argv[ii+1], &address);
+                ii += 2;
+                function = FUNC_RUN;
+            }
+        }
     }
 
     if (error || (!function && !console))
@@ -177,8 +199,11 @@ int main(int argc, char *argv[])
             case FUNC_UPLOAD:
                 DoUpload(pFilename, address);
                 break;
-            case 3:
+            case FUNC_EXEC:
                 DoExecute(pFilename, address);
+                break;
+            case FUNC_RUN:
+                DoRun(address);
                 break;
             }
 
@@ -203,7 +228,7 @@ static void ParseNumericArg(const char *pArg, unsigned int *pResult)
 static void PrintUsage(const char *pProgname)
 {
     printf("Sega Saturn USB flash cart transfer utility\n");
-    printf("by Anders Montonen, 2012\n");
+    printf("by Anders Montonen, 2012, 2015\n");
     printf("Usage: %s [-options] [-commands]\n\n", pProgname);
     printf("Options:\n");
     printf("    -v  <VID>                     Device VID (Default 0x0403)\n");
@@ -214,6 +239,7 @@ static void PrintUsage(const char *pProgname)
     printf("    -d  <file>  <address>  <size> Download data to file\n");
     printf("    -u  <file>  <address>         Upload data from file\n");
     printf("    -x  <file>  <address>         Upload program and execute\n");
+    printf("    -r  <address>                 Execute program\n");
     printf("USB IDs are given in hexadecimal, other arguments in decimal\n");
     printf("or hexadecimal (preceded by '0x')\n");
 }
@@ -262,7 +288,7 @@ static int DoDownload(const char *pFilename, const unsigned int address,
     if (pFileBuffer != NULL)
     {
         gettimeofday(&before, NULL);
-        status = SendCommandWithAddressAndLength(FUNC_DOWNLOAD,
+        status = SendCommandWithAddressAndLength(CMD_DOWNLOAD,
                                                  address, size);
         if (status < 0)
         {
@@ -363,7 +389,7 @@ static int DoUpload(const char *pFilename, const unsigned int address)
             checksum = crc_finalize(checksum);
 
             gettimeofday(&before, NULL);
-            status = SendCommandWithAddressAndLength(FUNC_UPLOAD,
+            status = SendCommandWithAddressAndLength(CMD_UPLOAD,
                                                      address, size);
             if (status < 0)
             {
@@ -423,25 +449,34 @@ UploadError:
     return status < 0 ? 0 : 1;
 }
 
-static int DoExecute(const char *pFilename, const unsigned int Address)
+static int DoRun(const unsigned int address)
 {
     int status = 0;
-    if (DoUpload(pFilename, Address))
+
+    SendBuf[0] = CMD_EXEC;
+    SendBuf[1] = (unsigned char)(address >> 24);
+    SendBuf[2] = (unsigned char)(address >> 16);
+    SendBuf[3] = (unsigned char)(address >> 8);
+    SendBuf[4] = (unsigned char)address;
+    status = ftdi_write_data(&Device, SendBuf, 5);
+    if (status < 0)
     {
-        SendBuf[0] = FUNC_EXEC; /* Client function */
-        SendBuf[1] = (unsigned char)(Address >> 24);
-        SendBuf[2] = (unsigned char)(Address >> 16);
-        SendBuf[3] = (unsigned char)(Address >> 8);
-        SendBuf[4] = (unsigned char)Address;
-        status = ftdi_write_data(&Device, SendBuf, 5);
-        if (status < 0)
-        {
-            printf("Send execute error: %s\n",
-                   ftdi_get_error_string(&Device));
-        }
+        printf("Send execute error: %s\n",
+               ftdi_get_error_string(&Device));
     }
 
     return status < 0 ? 0 : 1;
+}
+
+static int DoExecute(const char *pFilename, const unsigned int address)
+{
+    int status = 0;
+    if (DoUpload(pFilename, address))
+    {
+        status = DoRun(address);
+    }
+
+    return status;
 }
 
 static int InitComms(const int VID, const int PID)
