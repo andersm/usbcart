@@ -32,9 +32,9 @@ EXE	=	ftx
 OBJ	=	obj/xfer.o \
         obj/crc.o
 
-all	:	makedir $(EXE)
+all	:	$(EXE)
 
-$(EXE)	:	$(OBJ)
+$(EXE)	:	makedir $(OBJ)
 		$(CC) $(OBJ) $(LDFLAGS) -o $(EXE)
 
 obj/%.o :	%.c
