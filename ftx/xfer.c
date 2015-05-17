@@ -384,7 +384,12 @@ static int DoUpload(const char *pFilename, const unsigned int address)
         }
         else
         {
-            fread(pFileBuffer, 1, size, File);
+            if (fread(pFileBuffer, 1, size, File) != size)
+            {
+                printf("File read error\n");
+                goto UploadError;
+            }
+
             checksum = crc_update(checksum, pFileBuffer, size);
             checksum = crc_finalize(checksum);
 
