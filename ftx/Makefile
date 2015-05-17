@@ -23,29 +23,29 @@
 #   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #   POSSIBILITY OF SUCH DAMAGE.
 
-CC	=	cc
-FLAGS	=	-Wall -Werror -std=c99 $(shell pkg-config --cflags libftdi)
-LDFLAGS =   $(shell pkg-config --libs libftdi)
+CC = cc
+CFLAGS  = -Wall -Werror -std=c99 -O2 $(shell pkg-config --cflags libftdi)
+LDFLAGS = $(shell pkg-config --libs libftdi)
 
-EXE	=	ftx
+EXE = ftx
 
-OBJ	=	obj/xfer.o \
-        obj/crc.o
+OBJ = obj/xfer.o \
+	obj/crc.o
 
-all	:	$(EXE)
+all : $(EXE)
 
-$(EXE)	:	makedir $(OBJ)
-		$(CC) $(OBJ) $(LDFLAGS) -o $(EXE)
+$(EXE) : makedir $(OBJ)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(EXE)
 
-obj/%.o :	%.c
-		$(CC) -c $< -o $@ $(FLAGS)
+obj/%.o : %.c
+	$(CC) -c $< -o $@ $(CFLAGS)
 
-clean	:
-		rm -f obj/*.o
-		rm -f $(EXE)
+clean :
+	rm -f obj/*.o
+	rm -f $(EXE)
 
 makedir :
-		mkdir -p obj
+	mkdir -p obj
 
 #
 # end of makefile
