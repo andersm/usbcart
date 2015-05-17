@@ -1,5 +1,5 @@
 #   Sega Saturn USB flash cart ROM
-#   Copyright © 2012, Anders Montonen
+#   Copyright © 2012, 2015 Anders Montonen
 #   All rights reserved.
 #
 #   Redistribution and use in source and binary forms, with or without
@@ -25,25 +25,41 @@
 
 CC = sh-elf-gcc
 AS = sh-elf-as
-LDFLAGS = -nostartfiles -nostdlib -T ldscript
-FLAGS   = -Wall -Werror -m2 -Os -fomit-frame-pointer -std=c99
+OBJCOPY = sh-elf-objcopy
+LDFLAGS = -nostartfiles -nostdlib -T $(LDSCRIPT)
+CFLAGS  = -Wall -Werror -m2 -Os -fomit-frame-pointer -std=c99
 
 LIBS = -lgcc
 
 EXE = romimage.bin
+
+RAMEXE = ramimage.bin
+RAMEXEOBJ = ramimage.elf
 
 OBJ = obj/crt0.o \
 	obj/main.o   \
 	obj/crc.o    \
 	obj/sysid.o
 
+RAMOBJ = obj/crt0.o \
+	obj/main.o   \
+	obj/crc.o
+
 all : $(EXE)
 
+ram : $(RAMEXE)
+
+$(EXE) : LDSCRIPT = ldscript
 $(EXE) : makedir $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) $(LIBS) -o $(EXE)
 
+$(RAMEXE) : LDSCRIPT = ramldscript
+$(RAMEXE) : makedir $(RAMOBJ)
+	$(CC) $(LDFLAGS) $(RAMOBJ) $(LIBS) -o $(RAMEXEOBJ)
+	$(OBJCOPY) -O binary $(RAMEXEOBJ) $(RAMEXE)
+
 obj/%.o : %.c
-	$(CC) -c $< -o $@ $(FLAGS)
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 obj/%.o : %.S
 	$(AS) $< -o $@
@@ -51,6 +67,8 @@ obj/%.o : %.S
 clean :
 	rm -f obj/*.o
 	rm -f $(EXE)
+	rm -f $(RAMEXE)
+	rm -f $(RAMEXEOBJ)
 
 makedir :
 	mkdir -p obj
