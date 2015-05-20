@@ -1,6 +1,6 @@
 /*
  * Sega Saturn USB flash cart ROM linker script
- * Anders Montonen, 2012
+ * Anders Montonen, 2012, 2015
  *
  * Based on Bart Trzynadlowski's Custom Sega Saturn Linker Script
  * Public domain
@@ -20,11 +20,18 @@ SECTIONS
     .data :
     {
         *(.data);
-        __ip_end = .;
-        . = ALIGN (8192);
+        *(.rodata);
     }
-    __ip_len = __ip_end - __ip_start;
     __bss_start = .;
     .bss : { *(.bss);  }
     __bss_end = .;
+    .uncached (. | 0x20000000) : AT(ADDR(.bss) + SIZEOF(.bss))
+    {
+        . = ALIGN(4);
+        *(.uncached)
+        . = ALIGN (8192);
+    }
+    . = ADDR(.bss) + SIZEOF(.bss) + SIZEOF(.uncached);
+    __ip_end = .;
+    __ip_len = __ip_end - __ip_start;
 }

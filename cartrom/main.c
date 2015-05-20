@@ -1,7 +1,7 @@
 /*
 
     Sega Saturn USB flash cart ROM
-    Copyright © 2012, Anders Montonen
+    Copyright © 2012, 2015 Anders Montonen
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,9 @@
 
 #include <stdint.h>
 
-#include "vdp2.h"
+#include "cpu.h"
 #include "scu.h"
+#include "vdp2.h"
 
 #include "crc.h"
 
@@ -39,6 +40,9 @@
 #define USB_TXE     (1 << 1)
 #define USB_PWREN   (1 << 7)
 #define USB_FIFO (*(volatile uint8_t*)(0x22100001))
+
+#define WAIT_FOR_READ_FIFO()    do{while((USB_FLAGS&USB_RXF));}while(0)
+#define WAIT_FOR_WRITE_FIFO()   do{while((USB_FLAGS&USB_TXE));}while(0)
 
 #define RGB(r, g, b) ((((b)&0x1f)<<10)|(((g)&0x1f)<<5)|((r)&0x1f))
 
@@ -57,6 +61,46 @@ typedef enum
     GREEN,
     ORANGE
 } Color_e;
+
+__attribute__((section(".uncached"), noinline))
+static void PurgeCache(void)
+{
+    uint8_t reg = CCR;
+    reg &= ~CCR_CE;
+    CCR = reg;
+    reg |= CCR_CP;
+    CCR = reg;
+    reg |= CCR_CE;
+    CCR = reg;
+}
+
+static void InitDma(void)
+{
+    (void)CHCR0;
+    CHCR0 = 0;
+    SAR0 = (uint32_t)&USB_FIFO;
+    (void)DMAOR;
+    DMAOR = DMAOR_DME;
+}
+
+static void ResetDma(void)
+{
+    (void)CHCR0;
+    CHCR0 = 0;
+    (void)DMAOR;
+    DMAOR = 0;
+}
+
+static void ReceiveDma(uint8_t *pBuffer, uint32_t len)
+{
+    (void)CHCR0;
+    CHCR0 = 0;
+    DAR0 = (uint32_t)pBuffer;
+    TCR0 = len;
+    WAIT_FOR_READ_FIFO();
+    CHCR0 = CHCR_DM0|CHCR_AR|CHCR_DE;
+    while ((CHCR0 & CHCR_TE) == 0) ;
+}
 
 static void SetScreenColor(Color_e color)
 {
@@ -79,7 +123,7 @@ static void SignalError(void)
 
 static uint8_t RecvByte(void)
 {
-    while ((USB_FLAGS & USB_RXF) != 0) ;
+    WAIT_FOR_READ_FIFO();
     return USB_FIFO;
 }
 
@@ -95,7 +139,7 @@ static uint32_t RecvDword(void)
 
 static void SendByte(uint8_t byte)
 {
-    while ((USB_FLAGS & USB_TXE) != 0) ;
+    WAIT_FOR_WRITE_FIFO();
     USB_FIFO = byte;
 }
 
@@ -113,7 +157,7 @@ static void DoDownload(void)
 
     for (ii = 0; ii < len; ++ii)
     {
-        while ((USB_FLAGS & USB_TXE) != 0) ;
+        WAIT_FOR_WRITE_FIFO();
         USB_FIFO = pData[ii];
     }
 
@@ -123,10 +167,25 @@ static void DoDownload(void)
     SendByte(checksum);
 }
 
+static void DoDmaUpload(uint8_t *pBuffer, uint32_t len)
+{
+    while (len > 64)
+    {
+        ReceiveDma(pBuffer, 64);
+        pBuffer += 64;
+        len -= 64;
+    }
+
+    if (len > 0)
+    {
+        ReceiveDma(pBuffer, len);
+    }
+}
+
 static void DoUpload(void)
 {
     uint8_t    *pData;
-    uint32_t    len, ii;
+    uint32_t    len;
     crc_t       readchecksum;
     crc_t       checksum = crc_init();
 
@@ -136,15 +195,11 @@ static void DoUpload(void)
 
     len = RecvDword();
 
-    for (ii = 0; ii < len; ++ii)
-    {
-        // inlining is 20K/s faster
-        while ((USB_FLAGS & USB_RXF) != 0) ;
-        pData[ii] = USB_FIFO;
-    }
+    DoDmaUpload(pData, len);
 
     readchecksum = RecvByte();
 
+    PurgeCache();
     checksum = crc_update(checksum, pData, len);
     checksum = crc_finalize(checksum);
 
@@ -202,7 +257,9 @@ int main(void)
             DoDownload();
             break;
         case 2:
+            InitDma();
             DoUpload();
+            ResetDma();
             break;
         case 3:
             DoExecute();
