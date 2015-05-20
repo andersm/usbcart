@@ -1,7 +1,7 @@
 /*
 
     Sega Saturn cartridge flash tool
-    Copyright © 2012, Anders Montonen
+    Copyright © 2012, 2015 Anders Montonen
     Original software by ExCyber
     Graphics routines by Charles MacDonald
     All rights reserved.
@@ -98,27 +98,17 @@ int main(void)
         WaitForVBLANKOut();
     }
 
-    _printf(2, 6, 0xF0, "Flash Vendor ID:");
-    WaitForVBLANKIn();
-    WaitForVBLANKOut();
-
     vendorID = FlashGetVendorID();
-    _printhexl(19, 6, 0xF0, vendorID);
-    WaitForVBLANKIn();
-    WaitForVBLANKOut();
-
-    _printf(2, 7, 0xF0, "Flash Device ID:");
-    WaitForVBLANKIn();
-    WaitForVBLANKOut();
-
     deviceID = FlashGetDeviceID();
-    _printhexl(19, 7, 0xF0, deviceID);
-    WaitForVBLANKIn();
-    WaitForVBLANKOut();
-
     FillFlashDeviceInfo(vendorID, deviceID, &device);
+
+    _printf(2, 6, 0xF0, "Flash Vendor ID:");
+    _printhexl(19, 6, 0xF0, vendorID);
+    _printf(2, 7, 0xF0, "Flash Device ID:");
+    _printhexl(19, 7, 0xF0, deviceID);
     _printf(2, 8, 0xF0, device.pVendorString);
     _printf(2, 9, 0xF0, device.pDeviceString);
+
     WaitForVBLANKIn();
     WaitForVBLANKOut();
 

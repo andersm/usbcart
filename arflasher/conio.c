@@ -1,7 +1,7 @@
 /*
 
     Sega Saturn cartridge flash tool
-    Copyright © 2012, Anders Montonen
+    Copyright © 2012, 2015 Anders Montonen
     Original software by ExCyber
     Graphics routines by Charles MacDonald
     All rights reserved.
