@@ -44,6 +44,8 @@
 #define WAIT_FOR_READ_FIFO()    do{while((USB_FLAGS&USB_RXF));}while(0)
 #define WAIT_FOR_WRITE_FIFO()   do{while((USB_FLAGS&USB_TXE));}while(0)
 
+#define USB_OUT_EP_SIZE 64
+
 #define RGB(r, g, b) ((((b)&0x1f)<<10)|(((g)&0x1f)<<5)|((r)&0x1f))
 
 const uint16_t ColorTable[] =
@@ -169,11 +171,11 @@ static void DoDownload(void)
 
 static void DoDmaUpload(uint8_t *pBuffer, uint32_t len)
 {
-    while (len > 64)
+    while (len >= USB_OUT_EP_SIZE)
     {
-        ReceiveDma(pBuffer, 64);
-        pBuffer += 64;
-        len -= 64;
+        ReceiveDma(pBuffer, USB_OUT_EP_SIZE);
+        pBuffer += USB_OUT_EP_SIZE;
+        len -= USB_OUT_EP_SIZE;
     }
 
     if (len > 0)
