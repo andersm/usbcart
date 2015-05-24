@@ -243,12 +243,6 @@ int main(void)
 
     InitVideo();
 
-    // Configure SCU A-bus settings
-    // Disabling A-bus refresh adds ~20KB/s
-    AREF = 0;
-    // Removing wait states doubles speed
-    ASR0 = 0;
-
     while(1)
     {
         SetScreenColor(GREEN);
