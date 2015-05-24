@@ -171,7 +171,7 @@ static void DoDownload(void)
 
 static void DoDmaUpload(uint8_t *pBuffer, uint32_t len)
 {
-    while (len >= USB_OUT_EP_SIZE)
+    while (len > USB_OUT_EP_SIZE)
     {
         ReceiveDma(pBuffer, USB_OUT_EP_SIZE);
         pBuffer += USB_OUT_EP_SIZE;
