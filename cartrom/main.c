@@ -148,16 +148,15 @@ static void SendByte(uint8_t byte)
 static void DoDownload(void)
 {
     uint8_t    *pData;
-    uint32_t    len, ii;
+    uint32_t    len;
     crc_t       checksum = crc_init();
 
     SetScreenColor(ORANGE);
 
     pData = (uint8_t*)RecvDword();
-
     len = RecvDword();
 
-    for (ii = 0; ii < len; ++ii)
+    for (uint32_t ii = 0; ii < len; ++ii)
     {
         WAIT_FOR_WRITE_FIFO();
         USB_FIFO = pData[ii];
@@ -194,7 +193,6 @@ static void DoUpload(void)
     SetScreenColor(ORANGE);
 
     pData = (uint8_t*)RecvDword();
-
     len = RecvDword();
 
     DoDmaUpload(pData, len);
@@ -262,7 +260,6 @@ int main(void)
             InitVideo();
             break;
         }
-
     }
 
     return 0;
