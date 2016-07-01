@@ -192,8 +192,6 @@
     #define VCRWDT_BCMV2    (1<<2)
     #define VCRWDT_BCMV1    (1<<1)
     #define VCRWDT_BCMV0    (1<<0)
-#define VCRDMA0     (*(volatile uint32_t*)0xffffffa0)
-#define VCRDMA1     (*(volatile uint32_t*)0xffffffa8)
 
 /* DMA controller */
 #define DRCR0       (*(volatile uint8_t *)0xfffffe71)
