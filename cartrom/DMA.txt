@@ -1,0 +1,23 @@
+The DMA transfer code takes advantage of these implementation details of the
+FT245 chip and host driver:
+
+* The driver will send the data in as few USB transfers as possible, and
+* The chip's OUT endpoint is 64 bytes.
+
+This means that when the chip signals that the receive FIFO is not full, it is
+guaranteed to contain at least min(64, remaining_bytes) of data.
+
+Trying to implement DMA for transfers in the opposite direction (Saturn to
+host) runs into the following issues:
+
+* The Saturn is not able to synchronize to USB bus events, and
+* Although the chip's IN endpoint is also 64 bytes, the transfer has a 62-byte
+  payload. The remaining two bytes are used for status flags.
+
+This means that the only thing that can be safely assumed about the state of
+the chip's send FIFO is that:
+
+* If it was full, and
+* It becomes no longer full,
+
+then the FIFO has space for at least 62 bytes.
