@@ -18,3 +18,6 @@
 
 # Editor backups
 *~
+
+# Include KiCad cache libraries
+!*-cache.lib
