@@ -1,6 +1,6 @@
 usbcart
 =======
-A USB development cartridge with accompanying tools for the Sega Saturn. [See here for more info](http://www.iki.fi/Anders.Montonen/sega/usbcart.html).
+A USB development cartridge with accompanying tools for the Sega Saturn. [See here for more info](http://www.iki.fi/anders.montonen/sega/usbcart.html).
 
 usbcart-kicad
 -------------
